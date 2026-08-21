@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quest Log</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Quest Log</h1>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- Main Add Form -->
+    <form action="/add" method="POST" style="background: #1e1e1e; padding: 15px; border-radius: 8px;">
+        <input type="text" name="title" placeholder="Quest Title" required>
+        <select name="quest_type">
+            <option value="main">Main Quest</option>
+            <option value="sub">Sub Quest</option>
+            <option value="chore">Daily Chore</option>
+        </select>
+        <input type="date" name="due_date">
+        <button type="submit">Add Quest</button>
+    </form>
+
+    <div class="grid">
+        <!-- Main Quests -->
+        <div class="column">
+            <h2>Main Quests</h2>
+            {% for q in quests if q.quest_type == 'main' and not q.parent_id %}
+                <div class="quest-item {{ 'done' if q.is_done }}">
+                    <a href="/toggle/{{ q.id }}" class="check-btn">✓</a>
+                    <b>{{ q.title }}</b> 
+                    {% if q.due_date %}<small>(Due: {{ q.due_date }})</small>{% endif %}
+                </div>
+
+                <!-- Subtasks under Main Quest -->
+                {% for sub in quests if sub.parent_id == q.id %}
+                    <div class="subtask {{ 'done' if sub.is_done }}">
+                        <a href="/toggle/{{ sub.id }}" class="check-btn">✓</a> 
+                        {{ sub.title }} 
+                        {% if sub.due_date %}<small>(Due: {{ sub.due_date }})</small>{% endif %}
+                    </div>
+                {% endfor %}
+
+                <form action="/add" method="POST" style="margin-top: 5px;">
+                    <input type="hidden" name="parent_id" value="{{ q.id }}">
+                    <input type="hidden" name="quest_type" value="subtask">
+                    <input type="text" name="title" placeholder="Add step" required>
+                    <input type="date" name="due_date">
+                    <button type="submit">+</button>
+                </form>
+                <hr style="border-color: #333;">
+            {% endfor %}
+        </div>
+
+        <!-- Sub Quests -->
+        <div class="column">
+            <h2>Sub Quests</h2>
+            {% for q in quests if q.quest_type == 'sub' and not q.parent_id %}
+                <div class="quest-item {{ 'done' if q.is_done }}">
+                    <a href="/toggle/{{ q.id }}" class="check-btn">✓</a>
+                    <b>{{ q.title }}</b> 
+                    {% if q.due_date %}<small>(Due: {{ q.due_date }})</small>{% endif %}
+                </div>
+
+                <!-- Subtasks under Sub Quest -->
+                {% for sub in quests if sub.parent_id == q.id %}
+                    <div class="subtask {{ 'done' if sub.is_done }}">
+                        <a href="/toggle/{{ sub.id }}" class="check-btn">✓</a> 
+                        {{ sub.title }} 
+                        {% if sub.due_date %}<small>(Due: {{ sub.due_date }})</small>{% endif %}
+                    </div>
+                {% endfor %}
+
+                <form action="/add" method="POST" style="margin-top: 5px;">
+                    <input type="hidden" name="parent_id" value="{{ q.id }}">
+                    <input type="hidden" name="quest_type" value="subtask">
+                    <input type="text" name="title" placeholder="Add step" required>
+                    <input type="date" name="due_date">
+                    <button type="submit">+</button>
+                </form>
+                <hr style="border-color: #333;">
+            {% endfor %}
+        </div>
+
+        <!-- Daily Chores -->
+        <div class="column">
+            <h2>Daily Chores</h2>
+            {% for q in quests if q.quest_type == 'chore' %}
+                <div class="quest-item {{ 'done' if q.is_done }}">
+                    <a href="/toggle/{{ q.id }}" class="check-btn">✓</a>
+                    {{ q.title }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

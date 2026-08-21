@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ action }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="auth-container">
+        <form class="auth-box" method="POST">
+            <h2>{{ action }}</h2>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">{{ action }}</button>
+            {% if action == 'Log In' %}
+                <a href="/signup">Need an account? Sign Up</a>
+            {% else %}
+                <a href="/login">Already have an account? Log In</a>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
